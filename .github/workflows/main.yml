@@ -2,7 +2,7 @@ name: Flutter CI/CD
 
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ] # Substitua pelo nome do seu branch principal
 
 jobs:
   build_and_deploy:
@@ -14,18 +14,21 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v1
       with:
-        flutter-version: '3.10.2' 
+        flutter-version: '3.10.2' # Substitua '2.x' pela versão do Flutter que você está usando
 
     - name: Build Flutter Web
       run: flutter build web
 
-    - name: Deploy to S3
-      uses: jakejarvis/s3-sync-action@v0.5.1
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        args: --acl public-read --follow-symlinks --delete
-        sync_args: --delete
-        local_dir: ./build/web/
-        s3_bucket: ${{ secrets.S3_BUCKET }} 
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
-        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Copy files to the test website with the AWS CLI
+      uses: aws-actions/amazon-s3-copy@v1
+      with:
+        source-dir: 'build/web'
+        target-dir: 's3://${{ secrets.S3_BUCKET }}'
+        args: --acl public-read
