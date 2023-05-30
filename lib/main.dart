@@ -32,7 +32,7 @@ class TelaInicial extends StatelessWidget {
         title: Text('Solicitação de Cartões DM'),
       ),
       body: Center(
-        child: Text('Desafio DM'),
+        child: Text('Bem vindo(a) ao app do Desafio!'),
       ),
       drawer: Drawer(
         child: ListView(
